@@ -1,30 +1,75 @@
+# language: android
+# android:
+#   components:
+#     # Uncomment the lines below if you want to
+#     # use the latest revision of Android SDK Tools
+#     - tools
+#     - build-tools-27.0.3    
+#     # - platform-tools
+#     # The SDK version used to compile your project
+#     - android-27
+#     - android-22
+#     - extra-android-support
+#     - extra-google-m2repository
+#     - extra-android-m2repository
+#     # Additional components
+
+
+#     # Specify at least one system image,
+#     # if you need to run emulator(s) during your tests
+#     - sys-img-armeabi-v7a-android-22
+#     #- sys-img-armeabi-v7a-android-17
+# licenses:
+#     - 'android-sdk-license-.+'
+
+# before_install:
+#   - yes | sdkmanager "platforms;android-27"
+#   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+#   - emulator -avd test -no-skin -no-audio -no-window &
+#   - android-wait-for-emulator
+#   - adb shell input keyevent 82 &
+
 language: android
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
     - tools
-    - build-tools-27.0.3    
-    # - platform-tools
-    # The SDK version used to compile your project
-    - android-27
-    - android-22
+    - build-tools-30.0.2  # Updated build-tools version
+    - platform-tools
+    - android-30          # Updated SDK version
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
-    # Additional components
-
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
-    #- sys-img-armeabi-v7a-android-17
+    - sys-img-armeabi-v7a-android-22  # Keeping this for the emulator
 licenses:
-    - 'android-sdk-license-.+'
+  - 'android-sdk-license-.+'
 
 before_install:
-  - yes | sdkmanager "platforms;android-27"
+  # Accept licenses and install necessary components
+  - yes | sdkmanager "platforms;android-30" "build-tools;30.0.2"
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+script:
+  - ./gradlew assembleRelease  # Compile the app
+
+before_deploy:
+  - mkdir -p release
+  - cp erxeslibrary/build/outputs/apk/release/erxeslibrary-release.apk release/
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file: "release/erxeslibrary-release.apk"
+  on:
+    tags: true
