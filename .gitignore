@@ -1,0 +1,16 @@
+*.iml
+.gradle
+/local.properties
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+/.idea
+.idea/
+/q
+hs_err_pid29975.log
+app/src/main/java/io/erxes/main/MainActivity.java
+
