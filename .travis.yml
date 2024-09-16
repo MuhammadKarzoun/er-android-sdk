@@ -1,27 +1,35 @@
 language: android
+jdk: openjdk8
+
 android:
   components:
     - tools
     - platform-tools
-    - build-tools-30.0.2  # Updated build-tools version
-    - android-30          # Updated SDK version
+    - build-tools-30.0.2
+    - android-30
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-22  # Keeping this for the emulator
+    - sys-img-armeabi-v7a-android-22  # Image for the Android emulator
 
 licenses:
   - 'android-sdk-license-.+'
 
 before_install:
-  # Accept licenses and install necessary components
+  # Accept licenses for required SDK components
   - yes | sdkmanager "platforms;android-30" "build-tools;30.0.2"
   
-  # Install AVD and create emulator
+  # Install system images for the emulator
   - sdkmanager "system-images;android-22;default;armeabi-v7a"
+  
+  # Create and start the AVD (using avdmanager instead of the old android command)
   - avdmanager create avd -n test -k "system-images;android-22;default;armeabi-v7a" --force
+  
+  # Start the emulator
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
+  
+  # Unlock the emulator screen
   - adb shell input keyevent 82 &
 
 before_cache:
@@ -34,7 +42,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - ./gradlew assembleRelease  # Compile the app
+  - ./gradlew assembleRelease  # Build the APK
 
 before_deploy:
   - mkdir -p release
